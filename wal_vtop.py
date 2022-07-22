@@ -2,6 +2,7 @@ import os.path
 import json
 import sys
 import argparse
+import subprocess
 
 # wal_vtop details
 VERSION = "0.1.1"
@@ -23,8 +24,17 @@ def setConfig():
 		sys.exit(1)
 	# Set vtop directory by platform
 	if hostOS == "linux":
-		vtop_path = "/usr/lib/node_modules/vtop/themes"
-		vtop_theme = os.path.join(vtop_path, vtop_file)
+		node_version = subprocess.check_output(['node', '-v'],
+				stderr=subprocess.DEVNULL
+				).decode(sys.stdout.encoding).strip()
+		nvm_location = home_dir +'/.nvm'
+		nvm_exists = os.path.isdir(nvm_location)
+		if nvm_exists:
+			vtop_path = os.path.join(nvm_location, 'versions/node', node_version, 'lib/node_modules/vtop/themes')
+			vtop_theme = os.path.join(vtop_path, vtop_file)
+		else:
+			vtop_path = "/usr/lib/node_modules/vtop/themes"
+			vtop_theme = os.path.join(vtop_path, vtop_file)
 	elif hostOS == "win32":
 		print("Windows platform not supported")
 		sys.exit(1)
